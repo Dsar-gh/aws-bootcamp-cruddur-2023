@@ -1,0 +1,31 @@
+{
+    "BudgetLimit": {
+        "Amount": "1",
+        "Unit": "USD"
+    },
+    "BudgetName": "Budget-Track-Credit",
+    "BudgetType": "COST",
+    "CostFilters": {
+        "TagKeyValue": [
+            "user:Key$value1",
+            "user:Key$value2"
+        ]
+    },
+    "CostTypes": {
+        "IncludeCredit": true,
+        "IncludeDiscount": false,
+        "IncludeOtherSubscription": false,
+        "IncludeRecurring": false,
+        "IncludeRefund": false,
+        "IncludeSubscription": false,
+        "IncludeSupport": false,
+        "IncludeTax": false,
+        "IncludeUpfront": false,
+        "UseBlended": false
+    },
+    "TimePeriod": {
+        "Start": 1477958399,
+        "End": 3706473600
+    },
+    "TimeUnit": "MONTHLY"
+}

@@ -59,7 +59,7 @@ aws cloudwatch put-metric-alarm --cli-input-json file://aws/json/alarm-config.js
 
 ### Recreating Cruddur Logical and Conceptual Diagrams
 
-I didn't make a big change in the original diagram but moved the Amazon RDS within the Private Virtual Cloud in the Logical diagram. I used Lucid Charts for both diagrams.
+I didn't make a big change in the original diagram but moved the Amazon RDS within the Virtual Private Cloud in the Logical diagram. I used Lucid Charts for both diagrams.
 
 Here is the [Conceptual Diagram.](https://lucid.app/lucidchart/14da898a-834b-4c59-ad04-81038a67a108/edit?viewport_loc=-153%2C-112%2C2287%2C1108%2C0_0&invitationId=inv_641d93e2-018b-4440-9d04-cf5ef1d45ef2)
 

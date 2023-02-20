@@ -20,7 +20,7 @@ tasks:
        cd $THEIA_WORKSPACE_ROOT
 ```
 
-After that AWS CLI is installed automaticlly without issues.
+After that AWS CLI is installed automatically without issues.
 
 ![Installing AWS CLI](assets/Install%20AWS%20CLI.PNG)
 
@@ -72,7 +72,7 @@ And this is the [Logical Diagram.](https://lucid.app/lucidchart/f7e60776-576d-45
 
 ## Homework Challenges
 
-### Authenicate Root User using MFA
+### Authenticate Root User using MFA
 I was able to set MFA for my root user and IAM user.
 
 

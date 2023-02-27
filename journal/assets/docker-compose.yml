@@ -2,7 +2,7 @@ version: '3.1'
 
 services:
   web:
-    image: Doker-Healthcheck
+    image: docker-healthcheck
     ports:
       - '5000:5000'
     healthcheck:

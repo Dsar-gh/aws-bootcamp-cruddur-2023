@@ -1,8 +1,8 @@
 FROM python:3.6-alpine
 
-COPY . /app
+COPY . /docker-healthcheck
 
-WORKDIR /app
+WORKDIR /docker-healthcheck
 
 RUN pip install -r requirements.txt
 

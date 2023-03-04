@@ -1,10 +1,17 @@
 from datetime import datetime, timedelta, timezone
 from aws_xray_sdk.core import xray_recorder
+#import os
+from aws_xray_sdk.core.models.subsegment import Subsegment
+from aws_xray_sdk.core.utils.sqs_message_helper import SqsMessageHelper
+
+# X-Ray
+#xray_url = os.getenv("AWS_XRAY_URL")
+#xray_recorder.configure(service='notifications_activities', dynamic_naming=xray_url)
 
 class NotificationsActivities:
   def run():
     # xray 
-    segment = xray_recorder.begin_segment('notifications_activities')
+    subsegment = xray_recorder.begin_subsegment('notifications_activities')
 
     now = datetime.now(timezone.utc).astimezone()
     results = [{
@@ -29,10 +36,12 @@ class NotificationsActivities:
     }
     
     ]
-    subsegment = xray_recorder.begin_subsegment('mock-data')
+    #subsegment = xray_recorder.begin_subsegment('mock-data')
     dict = {
       "now": now.isoformat(),
       "results-size": len(results)
+    
     }
     subsegment.put_metadata('key', dict, 'namespace')
+    
     return results

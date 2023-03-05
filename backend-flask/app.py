@@ -58,12 +58,12 @@ trace.set_tracer_provider(provider)
 tracer = trace.get_tracer(__name__)
 
 # X-Ray
-xray_url = os.getenv("AWS_XRAY_URL")
-xray_recorder.configure(service='backend-flask', dynamic_naming=xray_url)
+#xray_url = os.getenv("AWS_XRAY_URL")
+#xray_recorder.configure(service='backend-flask', dynamic_naming=xray_url)
 
 app = Flask(__name__)
 # X-RAY 
-XRayMiddleware(app, xray_recorder)
+#XRayMiddleware(app, xray_recorder)
 
 # HoneyComb
 # Initialize automatic instrumentation with Flask
@@ -146,20 +146,20 @@ def data_create_message():
   return
 
 @app.route("/api/activities/home", methods=['GET'])
-@xray_recorder.capture('activities_home')
+#@xray_recorder.capture('activities_home')
 def data_home():
   #data = HomeActivities.run(Logger=LOGGER)
   data = HomeActivities.run()
   return data, 200
 
 @app.route("/api/activities/notifications", methods=['GET'])
-@xray_recorder.capture('activities_notifications')
+#@xray_recorder.capture('activities_notifications')
 def data_notifications():
   data = NotificationsActivities.run()
   return data, 200
 
 @app.route("/api/activities/@<string:handle>", methods=['GET'])
-@xray_recorder.capture('activities_user')
+#@xray_recorder.capture('activities_user')
 def data_handle(handle):
   model = UserActivities.run(handle)
   if model['errors'] is not None:

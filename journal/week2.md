@@ -279,6 +279,10 @@ import logging
   def run(logger):
     logger.info("HomeActivities")
 ```
+- After these changes, we could see the logs in AWS CloudWatch Logs console
+
+![cloudwatch logs](https://github.com/Dsar-gh/aws-bootcamp-cruddur-2023/blob/main/journal/assets/week2/Cloudwatch-log.PNG)
+
 
 ## Homework Challenges 
 

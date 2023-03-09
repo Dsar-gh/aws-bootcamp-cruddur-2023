@@ -2,9 +2,9 @@
 
 ## Required Homework
 
-### HoneyComb
+### Instrumenting with Honeycomb
 
-- We added the following packages in [`requirements.txt`](https://github.com/Dsar-gh/aws-bootcamp-cruddur-2023/blob/main/backend-flask/requirements.txt) to instrument our Flask app with OpenTelemetry.
+- We added the following packages in [`requirements.txt`](https://github.com/Dsar-gh/aws-bootcamp-cruddur-2023/blob/main/backend-flask/requirements.txt) to instrument our Flask application `app.py` with Honeycomb's OpenTelemetry distributions.
 ```txt
 opentelemetry-api 
 opentelemetry-sdk 

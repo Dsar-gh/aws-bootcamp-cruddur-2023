@@ -69,6 +69,9 @@ gp env -e HONEYCOMB_API_KEY=""
 - After that I was able to see the data sent to Honeycomb.
 ![Working Honeycomb](https://github.com/Dsar-gh/aws-bootcamp-cruddur-2023/blob/main/journal/assets/week2/working%20honeycomb.PNG)
 
+- A Troubleshooting tool: using the `HONEYCOMB_API_KEY` value to know who am I.
+ ![https://honeycomb-whoami.glitch.me/trace](https://honeycomb-whoami.glitch.me/trace)
+
 
 ### AWS X-Ray
 

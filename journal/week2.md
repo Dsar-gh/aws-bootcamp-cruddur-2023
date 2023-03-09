@@ -158,7 +158,8 @@ We added the following Environment Variables to the `backend-flask` service in t
 
 ## Homework Challenges 
 
- In the required homework we initialized an automatic instrumentation with our Flask-app. Here we added a manual instrumentation by modifying the [`home_activities.py`](https://github.com/Dsar-gh/aws-bootcamp-cruddur-2023/blob/main/backend-flask/services/home_activities.py) file creating a Tracer then adding attributes and adding a custom span as follows:
+### Honeycomb Manual Instrumentation
+ In the required homework, we initialized an automatic instrumentation with our Flask-app. Here we added a manual instrumentation by modifying the [`home_activities.py`](https://github.com/Dsar-gh/aws-bootcamp-cruddur-2023/blob/main/backend-flask/services/home_activities.py) file creating a Tracer then adding attributes and adding a custom span as follows:
  
  ```py
 from opentelemetry import trace

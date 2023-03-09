@@ -284,6 +284,73 @@ import logging
 ![cloudwatch logs](https://github.com/Dsar-gh/aws-bootcamp-cruddur-2023/blob/main/journal/assets/week2/Cloudwatch-log.PNG)
 
 
+### Rollbar
+
+#### Integrating Rollbar in our Flask Application for Error Logging
+
+- First, I created a new project in Rollbar called `Cruddur`.
+- Then I added the following packages to [`requirements.txt`](https://github.com/Dsar-gh/aws-bootcamp-cruddur-2023/blob/main/backend-flask/requirements.txt) then installed it using `pip install -r requirements.txt`.
+
+```txt
+blinker
+rollbar
+```
+- I set my access token in Gitpod environment.
+
+```sh
+export ROLLBAR_ACCESS_TOKEN=""
+gp env ROLLBAR_ACCESS_TOKEN=""
+```
+- I added the following Environment Variables to the `backend-flask` service in the  [`docker-compose.yml`](https://github.com/Dsar-gh/aws-bootcamp-cruddur-2023/blob/main/docker-compose.yml) file.
+
+```yml
+ROLLBAR_ACCESS_TOKEN: "${ROLLBAR_ACCESS_TOKEN}"
+```
+- Setting up Rollbar in the [`app.py`](https://github.com/Dsar-gh/aws-bootcamp-cruddur-2023/blob/main/backend-flask/app.py) file as follows:
+
+```py
+import rollbar
+import rollbar.contrib.flask
+from flask import got_request_exception
+```
+```py
+rollbar_access_token = os.getenv('ROLLBAR_ACCESS_TOKEN')
+@app.before_first_request
+def init_rollbar():
+    """init rollbar module"""
+    rollbar.init(
+        # access token
+        rollbar_access_token,
+        # environment name
+        'production',
+        # server root directory, makes tracebacks prettier
+        root=os.path.dirname(os.path.realpath(__file__)),
+        # flask already sets up logging
+        allow_logging_basic_config=False)
+
+    # send exceptions from `app` to rollbar, using flask's signal system.
+    got_request_exception.connect(rollbar.contrib.flask.report_exception, app)
+```
+
+- I added an endpoint for Rollbar in the [`app.py`](https://github.com/Dsar-gh/aws-bootcamp-cruddur-2023/blob/main/backend-flask/app.py) file as follows:
+
+```py
+@app.route('/rollbar/test')
+def rollbar_test():
+    rollbar.report_message('Hello World!', 'warning')
+    return "Hello World!"
+```
+
+- I confirmed the working of Rollbar and triggered an error to double check it.
+
+![rollbar](https://github.com/Dsar-gh/aws-bootcamp-cruddur-2023/blob/main/journal/assets/week2/rollbar-item.PNG)
+
+![rollbar](https://github.com/Dsar-gh/aws-bootcamp-cruddur-2023/blob/main/journal/assets/week2/rollbar-error.PNG)
+
+![rollbar](https://github.com/Dsar-gh/aws-bootcamp-cruddur-2023/blob/main/journal/assets/week2/rollbar-error2.PNG)
+
+
+
 ## Homework Challenges 
 
 ### Honeycomb Manual Instrumentation

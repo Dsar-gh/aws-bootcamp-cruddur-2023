@@ -73,7 +73,7 @@ gp env -e HONEYCOMB_API_KEY=""
 ### AWS X-Ray
 
 #### Instrumenting AWS X-Ray for Backend Flask Application
-We added the following package to the [`requirements.txt`](https://github.com/Dsar-gh/aws-bootcamp-cruddur-2023/blob/main/backend-flask/requirements.txt) and installed it using `pip install -r requirements.txt`.
+I added the following package to the [`requirements.txt`](https://github.com/Dsar-gh/aws-bootcamp-cruddur-2023/blob/main/backend-flask/requirements.txt) and installed it using `pip install -r requirements.txt`.
 
 ```py
 aws-xray-sdk
@@ -204,6 +204,43 @@ class NotificationsActivities:
 - After adding the the `capture` method and the subsegmnet, we could see that X-Ray traces with segments and subsegments appeared in the AWS X-Ray console.
 ![xray subsegment](https://github.com/Dsar-gh/aws-bootcamp-cruddur-2023/blob/main/journal/assets/week2/X-Ray-subsegment.PNG)
 
+
+### Configuring AWS CloudWatch Logs
+
+#### Installing WatchTower package
+
+- I added the `WatchTower` package to the [`requirements.txt`](https://github.com/Dsar-gh/aws-bootcamp-cruddur-2023/blob/main/backend-flask/requirements.txt) then installed it using `pip install -r requirements.txt`.
+```txt
+watchtower
+```
+
+- After that I imported the libraries into [`app.py`](https://github.com/Dsar-gh/aws-bootcamp-cruddur-2023/blob/main/backend-flask/app.py) file.
+```py
+import watchtower
+import logging
+from time import strftime
+```
+#### Writing a Custom Logger to Send Application Log Data to CloudWatch Log Group.
+
+- Setting up CloudWatch Logs
+```py
+# Configuring Logger to Use CloudWatch
+LOGGER = logging.getLogger(__name__)
+LOGGER.setLevel(logging.DEBUG)
+console_handler = logging.StreamHandler()
+cw_handler = watchtower.CloudWatchLogHandler(log_group='cruddur')
+LOGGER.addHandler(console_handler)
+LOGGER.addHandler(cw_handler)
+LOGGER.info("Test log")
+```
+- This will log ERRORS to CloudWatch Logs
+```py
+@app.after_request
+def after_request(response):
+    timestamp = strftime('[%Y-%b-%d %H:%M]')
+    LOGGER.error('%s %s %s %s %s %s', timestamp, request.remote_addr, request.method, request.scheme, request.full_path, response.status)
+    return response
+```
 
 
 ## Homework Challenges 

@@ -152,9 +152,10 @@ We added the following Environment Variables to the `backend-flask` service in t
 
 #### Adding AWS X-Ray subsegmnets
 - By adding a line of code with the capture method in the [`app.py`](https://github.com/Dsar-gh/aws-bootcamp-cruddur-2023/blob/main/backend-flask/app.py) file which creates X-Ray subsegment for synchronous functions
-```py
-@xray_recorder.capture('activities_home')
-``` 
+
+![capture](https://github.com/Dsar-gh/aws-bootcamp-cruddur-2023/blob/main/journal/assets/week2/Capture-method.PNG)
+
+
 
 ## Homework Challenges 
 

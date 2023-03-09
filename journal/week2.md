@@ -120,15 +120,18 @@ aws xray create-group \
    --group-name "Cruddur" \
    --filter-expression "service(\"backend-flask\")"
 ```
+
 To create the sampling rule we run this command.
 ```sh
 aws xray create-sampling-rule --cli-input-json file://aws/json/xray-sampling-rule.json
 ```
-Verfiying within the AWS Console.
+Verifying within the AWS Console.
 ![create sampling](https://github.com/Dsar-gh/aws-bootcamp-cruddur-2023/blob/main/journal/assets/week2/sampling-rule-created.PNG)
 
 #### Configuring and provisioning X-Ray daemon within docker-compose and send data back to X-Ray API
+
 We added a `xray-daemon` Service in the [`docker-compose.yml`](https://github.com/Dsar-gh/aws-bootcamp-cruddur-2023/blob/main/docker-compose.yml) file.
+
 ```yml
   xray-daemon:
     image: "amazon/aws-xray-daemon"
@@ -141,7 +144,9 @@ We added a `xray-daemon` Service in the [`docker-compose.yml`](https://github.co
     ports:
       - 2000:2000/udp
 ```
-We added the following Environment Variables to the `backend-flask` service in the  [`docker-compose.yml`](https://github.com/Dsar-gh/aws-bootcamp-cruddur-2023/blob/main/docker-compose.yml) file.
+
+I added the following Environment Variables to the `backend-flask` service in the  [`docker-compose.yml`](https://github.com/Dsar-gh/aws-bootcamp-cruddur-2023/blob/main/docker-compose.yml) file.
+
 ```yml
       AWS_XRAY_URL: "*4567-${GITPOD_WORKSPACE_ID}.${GITPOD_WORKSPACE_CLUSTER_HOST}*"
       AWS_XRAY_DAEMON_ADDRESS: "xray-daemon:2000"
@@ -151,11 +156,13 @@ We added the following Environment Variables to the `backend-flask` service in t
 ![working x-ray](https://github.com/Dsar-gh/aws-bootcamp-cruddur-2023/blob/main/journal/assets/week2/traces-xray.PNG)
 
 #### Adding AWS X-Ray subsegmnets
+
 - By adding a line of code with the `capture` method in the [`app.py`](https://github.com/Dsar-gh/aws-bootcamp-cruddur-2023/blob/main/backend-flask/app.py) file which creates X-Ray subsegment for synchronous functions
 
 ![capture](https://github.com/Dsar-gh/aws-bootcamp-cruddur-2023/blob/main/journal/assets/week2/Capture-method.PNG)
 
 - Then I added a subsegment in the run() function in the [`notifications_activities.py`](https://github.com/Dsar-gh/aws-bootcamp-cruddur-2023/blob/main/backend-flask/services/notifications_activities.py) service.
+
 ```py
 from datetime import datetime, timedelta, timezone
 from aws_xray_sdk.core import xray_recorder
@@ -210,19 +217,23 @@ class NotificationsActivities:
 #### Installing WatchTower package
 
 - I added the `WatchTower` package to the [`requirements.txt`](https://github.com/Dsar-gh/aws-bootcamp-cruddur-2023/blob/main/backend-flask/requirements.txt) then installed it using `pip install -r requirements.txt`.
+
 ```txt
 watchtower
 ```
 
 - After that I imported the libraries into [`app.py`](https://github.com/Dsar-gh/aws-bootcamp-cruddur-2023/blob/main/backend-flask/app.py) file.
+
 ```py
 import watchtower
 import logging
 from time import strftime
 ```
-#### Writing a Custom Logger to Send Application Log Data to CloudWatch Log Group.
 
-- Setting up CloudWatch Logs
+#### Setting up CloudWatch Logs
+
+- Writing a Custom Logger in our [`app.py`](https://github.com/Dsar-gh/aws-bootcamp-cruddur-2023/blob/main/backend-flask/app.py) file to Send Application Log Data to CloudWatch Logs Group `log_group='cruddur'`.
+
 ```py
 # Configuring Logger to Use CloudWatch
 LOGGER = logging.getLogger(__name__)
@@ -233,7 +244,8 @@ LOGGER.addHandler(console_handler)
 LOGGER.addHandler(cw_handler)
 LOGGER.info("Test log")
 ```
-- This will log ERRORS to CloudWatch Logs
+- These lines of code are added in our [`app.py`](https://github.com/Dsar-gh/aws-bootcamp-cruddur-2023/blob/main/backend-flask/app.py) file to log `error` to CloudWatch Logs
+
 ```py
 @app.after_request
 def after_request(response):
@@ -242,6 +254,31 @@ def after_request(response):
     return response
 ```
 
+- I added the following Environment Variables to the `backend-flask` service in the  [`docker-compose.yml`](https://github.com/Dsar-gh/aws-bootcamp-cruddur-2023/blob/main/docker-compose.yml) file.
+
+```yml
+      AWS_DEFAULT_REGION: "${AWS_DEFAULT_REGION}"
+      AWS_ACCESS_KEY_ID: "${AWS_ACCESS_KEY_ID}"
+      AWS_SECRET_ACCESS_KEY: "${AWS_SECRET_ACCESS_KEY}"
+```
+- To add a custom logging in the `home_activities.py` API endpoint, I modified the [`app.py`](https://github.com/Dsar-gh/aws-bootcamp-cruddur-2023/blob/main/backend-flask/app.py) file to take `logger` as an input and called `logger.info("HomeActivities")` in the in [`home_activities.py`](https://github.com/Dsar-gh/aws-bootcamp-cruddur-2023/blob/main/backend-flask/services/home_activities.py) file to confirm that things are working as expected.
+
+In `app.py`
+```py
+@app.route("/api/activities/home", methods=['GET'])
+def data_home():
+  data = HomeActivities.run(logger=LOGGER)
+  return data, 200
+```
+
+In `home_activities.py ` 
+```py
+import logging
+```
+```py
+  def run(logger):
+    logger.info("HomeActivities")
+```
 
 ## Homework Challenges 
 

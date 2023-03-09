@@ -151,16 +151,65 @@ We added the following Environment Variables to the `backend-flask` service in t
 ![working x-ray](https://github.com/Dsar-gh/aws-bootcamp-cruddur-2023/blob/main/journal/assets/week2/traces-xray.PNG)
 
 #### Adding AWS X-Ray subsegmnets
-- By adding a line of code with the capture method in the [`app.py`](https://github.com/Dsar-gh/aws-bootcamp-cruddur-2023/blob/main/backend-flask/app.py) file which creates X-Ray subsegment for synchronous functions
+- By adding a line of code with the `capture` method in the [`app.py`](https://github.com/Dsar-gh/aws-bootcamp-cruddur-2023/blob/main/backend-flask/app.py) file which creates X-Ray subsegment for synchronous functions
 
 ![capture](https://github.com/Dsar-gh/aws-bootcamp-cruddur-2023/blob/main/journal/assets/week2/Capture-method.PNG)
+
+- Then I added a subsegment in the run() function in the [`notifications_activities.py`](https://github.com/Dsar-gh/aws-bootcamp-cruddur-2023/blob/main/backend-flask/services/notifications_activities.py) service.
+```py
+from datetime import datetime, timedelta, timezone
+from aws_xray_sdk.core import xray_recorder
+
+class NotificationsActivities:
+  def run():
+    # xray 
+      try:
+      now = datetime.now(timezone.utc).astimezone()
+      results = [{
+        'uuid': '68f126b0-1ceb-4a33-88be-d90fa7109eee',
+        'handle':  'Lloyd',
+        'message': 'I am a Ninja',
+        'created_at': (now - timedelta(days=2)).isoformat(),
+        'expires_at': (now + timedelta(days=5)).isoformat(),
+        'likes_count': 5,
+        'replies_count': 1,
+        'reposts_count': 0,
+        'replies': [{
+          'uuid': '26e12864-1c26-5c3a-9658-97a10f8fea67',
+          'reply_to_activity_uuid': '68f126b0-1ceb-4a33-88be-d90fa7109eee',
+          'handle':  'Worf',
+          'message': 'This post has no honor!',
+          'likes_count': 0,
+          'replies_count': 0,
+          'reposts_count': 0,
+          'created_at': (now - timedelta(days=2)).isoformat()
+        }],
+      }
+      ]
+      
+      subsegment = xray_recorder.begin_subsegment('mock-data')
+      # xray 
+      dict = {
+        "now": now.isoformat(),
+        "results-size": len(results)
+      }
+      subsegment.put_metadata('key', dict, 'namespace')
+      xray_recorder.end_subsegment()
+    finally:  
+      # Close the segment
+      xray_recorder.end_subsegment()
+      
+    return results
+```
+- After adding the the `capture` method and the subsegmnet, we could see that X-Ray traces with segments and subsegments appeared in the AWS X-Ray console.
+![xray subsegment](https://github.com/Dsar-gh/aws-bootcamp-cruddur-2023/blob/main/journal/assets/week2/X-Ray-subsegment.PNG)
 
 
 
 ## Homework Challenges 
 
 ### Honeycomb Manual Instrumentation
- In the required homework, we initialized an automatic instrumentation with our Flask-app. Here we added a manual instrumentation by modifying the [`home_activities.py`](https://github.com/Dsar-gh/aws-bootcamp-cruddur-2023/blob/main/backend-flask/services/home_activities.py) file creating a Tracer then adding attributes and adding a custom span as follows:
+ In the required homework, I initialized an automatic instrumentation with our Flask-app. Here we added a manual instrumentation by modifying the [`home_activities.py`](https://github.com/Dsar-gh/aws-bootcamp-cruddur-2023/blob/main/backend-flask/services/home_activities.py) file creating a Tracer then adding attributes and adding a custom span as follows:
  
  ```py
 from opentelemetry import trace

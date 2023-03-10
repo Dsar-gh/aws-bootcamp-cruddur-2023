@@ -4,7 +4,7 @@
 
 ### Instrumenting with Honeycomb
 
-- We added the following packages in [`requirements.txt`](https://github.com/Dsar-gh/aws-bootcamp-cruddur-2023/blob/main/backend-flask/requirements.txt) to instrument our Flask application `app.py` with Honeycomb's OpenTelemetry distributions.
+- I added the following packages in [`requirements.txt`](https://github.com/Dsar-gh/aws-bootcamp-cruddur-2023/blob/main/backend-flask/requirements.txt) to instrument our Flask application `app.py` with Honeycomb's OpenTelemetry distributions.
 ```txt
 opentelemetry-api 
 opentelemetry-sdk 
@@ -12,12 +12,13 @@ opentelemetry-exporter-otlp-proto-http
 opentelemetry-instrumentation-flask 
 opentelemetry-instrumentation-requests
 ```
-To install these packages, we run the following command :
+To install these packages, 
+run the following command :
 
 ```sh
 pip install -r requirements.txt
 ```
-- To create and initialize a tracer and Flask instrumentation to send data to Honeycomb we added the following lines in the [`app.py`](https://github.com/Dsar-gh/aws-bootcamp-cruddur-2023/blob/main/backend-flask/app.py) file.
+- To create and initialize a tracer and Flask instrumentation to send data to Honeycomb, I added the following lines in the [`app.py`](https://github.com/Dsar-gh/aws-bootcamp-cruddur-2023/blob/main/backend-flask/app.py) file.
 ```python
 # HoneyComb 
 from opentelemetry import trace
@@ -44,7 +45,7 @@ app = Flask(__name__)
 FlaskInstrumentor().instrument_app(app)
 RequestsInstrumentor().instrument()
 ```
-- We added the following Environment Variables to the `backend-flask` service in the [`docker-compose.yml`](https://github.com/Dsar-gh/aws-bootcamp-cruddur-2023/blob/main/docker-compose.yml) file. 
+- I added the following Environment Variables to the `backend-flask` service in the [`docker-compose.yml`](https://github.com/Dsar-gh/aws-bootcamp-cruddur-2023/blob/main/docker-compose.yml) file. 
 
 ```yml
 OTEL_EXPORTER_OTLP_ENDPOINT: "https://api.honeycomb.io"
@@ -97,7 +98,7 @@ app = Flask(__name__)
 XRayMiddleware(app, xray_recorder)
 ```
 
-We added the [`aws/json/xray-sampling-rule.json`](https://github.com/Dsar-gh/aws-bootcamp-cruddur-2023/blob/main/aws/json/xray.json) file.
+I added the [`aws/json/xray-sampling-rule.json`](https://github.com/Dsar-gh/aws-bootcamp-cruddur-2023/blob/main/aws/json/xray.json) file.
 
 ```json
 {
@@ -117,14 +118,14 @@ We added the [`aws/json/xray-sampling-rule.json`](https://github.com/Dsar-gh/aws
 }
 ```
 
-We run this command to create a log group inside AWS X-Ray.
+I run this command to create a log group inside AWS X-Ray.
 ```sh
 aws xray create-group \
    --group-name "Cruddur" \
    --filter-expression "service(\"backend-flask\")"
 ```
 
-To create the sampling rule we run this command.
+To create the sampling rule I run this command.
 ```sh
 aws xray create-sampling-rule --cli-input-json file://aws/json/xray-sampling-rule.json
 ```
@@ -133,7 +134,7 @@ Verifying within the AWS Console.
 
 #### Configuring and provisioning X-Ray daemon within docker-compose and send data back to X-Ray API
 
-We added a `xray-daemon` Service in the [`docker-compose.yml`](https://github.com/Dsar-gh/aws-bootcamp-cruddur-2023/blob/main/docker-compose.yml) file.
+I added a `xray-daemon` Service in the [`docker-compose.yml`](https://github.com/Dsar-gh/aws-bootcamp-cruddur-2023/blob/main/docker-compose.yml) file.
 
 ```yml
   xray-daemon:

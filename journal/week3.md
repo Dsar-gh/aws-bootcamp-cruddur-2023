@@ -79,3 +79,49 @@ const checkAuth = async () => {
 };
 
 ```
+
+#### [`DesktopNavigation.js`](https://github.com/Dsar-gh/aws-bootcamp-cruddur-2023/blob/main/frontend-react-js/src/components/DesktopNavigation.js)
+
+I didn't change anything. It was already done.
+
+#### [`ProfileInfo.js`](https://github.com/Dsar-gh/aws-bootcamp-cruddur-2023/blob/main/frontend-react-js/src/components/ProfileInfo.js)
+
+In the `ProfileInfo` function I modified the code related to the variable `signOut` as follows.
+
+```js
+import { Auth } from 'aws-amplify';
+
+const signOut = async () => {
+  try {
+      await Auth.signOut({ global: true });
+      window.location.href = "/"
+  } catch (error) {
+      console.log('error signing out: ', error);
+  }
+}
+```
+
+#### [`DesktopSidebar.js`](https://github.com/Dsar-gh/aws-bootcamp-cruddur-2023/blob/main/frontend-react-js/src/components/DesktopSidebar.js)
+
+I rearranged the `if` statements, to make the code clearer.
+
+```js
+  let trending;
+  let suggested;
+  let join;
+  if (props.user) {
+    trending = <TrendingSection trendings={trendings} />
+    suggested = <SuggestedUsersSection users={users} />
+  } else {
+    join = <JoinSection />
+  }
+```
+
+
+
+
+
+
+
+
+

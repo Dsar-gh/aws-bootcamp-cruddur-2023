@@ -1,1 +1,81 @@
 # Week 3 — Decentralized Authentication
+
+## Required Homework
+
+### Creating Amazon Cognito User Pool 
+
+Using Amazon Cognito Console, a user pool is created.
+
+![User pool](https://github.com/Dsar-gh/aws-bootcamp-cruddur-2023/blob/main/journal/assets/week3/user-pool-created.PNG)
+
+### Install and Configure Amplify Client-Side Library for Amazon Cognito
+
+- The following command will install `aws-amplify` package and save it in my `package.json`. This way, it'll become one of my project dependencies and will be automatically installed the next time I run `npm` or compose up my `docker-compose.yml`. 
+
+```sh
+npm i aws-amplify --save
+```
+
+- I added the following Environment Variables to the `frontend-react-js` service in the [`docker-compose.yml`](https://github.com/Dsar-gh/aws-bootcamp-cruddur-2023/blob/main/docker-compose.yml) file.
+
+```yml
+    REACT_APP_AWS_PROJECT_REGION: "${AWS_DEFAULT_REGION}"
+    REACT_APP_AWS_COGNITO_REGION: "${AWS_DEFAULT_REGION}"
+    REACT_APP_AWS_USER_POOLS_ID: "us-east-1_qLUhJF0h9"
+    REACT_APP_CLIENT_ID: "3iipit8oj48lsujj3u0guiqune"
+```
+
+- To link my Cognito user pool to my Cruddur, the following lines of code are  added in the [`App.js`](https://github.com/Dsar-gh/aws-bootcamp-cruddur-2023/blob/main/frontend-react-js/src/App.js) file
+
+```js
+import { Amplify } from 'aws-amplify';
+
+Amplify.configure({
+  "AWS_PROJECT_REGION": process.env.REACT_APP_AWS_PROJECT_REGION,
+  "aws_cognito_region": process.env.REACT_APP_AWS_COGNITO_REGION,
+  "aws_user_pools_id": process.env.REACT_APP_AWS_USER_POOLS_ID,
+  "aws_user_pools_web_client_id": process.env.REACT_APP_CLIENT_ID,
+  "oauth": {}, 
+  Auth: {
+    // We are not using an Identity Pool
+    // identityPoolId: process.env.REACT_APP_IDENTITY_POOL_ID, // REQUIRED - Amazon Cognito Identity Pool ID
+    region: process.env.REACT_APP_AWS_PROJECT_REGION,           // REQUIRED - Amazon Cognito Region
+    userPoolId: process.env.REACT_APP_AWS_USER_POOLS_ID,         // OPTIONAL - Amazon Cognito User Pool ID
+    userPoolWebClientId: process.env.REACT_APP_CLIENT_ID,   // OPTIONAL - Amazon Cognito Web Client ID (26-char alphanumeric string)
+  }
+});
+```
+### Conditionally show components based on logged in or logged out
+
+The pages `HomeFeedPage.js`, `DesktopNavigation.js`, `ProfileInfo.js`, and  `DesktopSidebar.js` are modified based on the user's state.
+
+#### [`HomeFeedPage.js`](https://github.com/Dsar-gh/aws-bootcamp-cruddur-2023/blob/main/frontend-react-js/src/pages/HomeFeedPage.js)
+
+I Modified the code of `checkAuth` method to authenticate Cognito user.
+
+```js
+import { Auth } from 'aws-amplify';
+
+// to set a state. But I don't need to add it. It's already existed.
+const [user, setUser] = React.useState(null);
+
+const checkAuth = async () => {
+  Auth.currentAuthenticatedUser({
+    // Optional, By default is false. 
+    // If set to true, this call will send a 
+    // request to Cognito to get the latest user data
+    bypassCache: false 
+  })
+  .then((user) => {
+    console.log('user',user);
+    return Auth.currentAuthenticatedUser()
+  }).then((cognito_user) => {
+      setUser({
+        display_name: cognito_user.attributes.name,
+        handle: cognito_user.attributes.preferred_username
+      })
+  })
+  .catch((err) => console.log(err));
+};
+
+```

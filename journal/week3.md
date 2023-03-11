@@ -149,11 +149,13 @@ const [errors, setErrors] = React.useState('');
   ```
   ![sign-in](https://github.com/Dsar-gh/aws-bootcamp-cruddur-2023/blob/main/journal/assets/week3/sgin-in.PNG)
 
-To try my code one more time, I created a user in Amazon Cognito user pool and an error was triggered when I tried to sign in. It's because the user is created manually from AWS Cognito Console and  wasn't verified. To solve this issue I run the following command.
+To try my code one more time, I created a user in Amazon Cognito user pool and an error was triggered when I tried to sign in. It's because the user is created manually from AWS Cognito Console and  wasn't verified. To solve this issue, I run the following command.
 
 ```sh
-aws cognito-idp admin-set-user-password --username d8ba86bb-1e60-43c4-8f8b-41f5024d53e2 --password Test1234? --user-pool-id us-east-1_qLUhJF0h9 --permanent
+aws cognito-idp admin-set-user-password --user-pool-id us-east-1_qLUhJF0h9 --username Dsar --password Test1234?  --permanent
 ```
+![sign in worked](https://github.com/Dsar-gh/aws-bootcamp-cruddur-2023/blob/main/journal/assets/week3/prefered-name-added.PNG)
+
 
 
 

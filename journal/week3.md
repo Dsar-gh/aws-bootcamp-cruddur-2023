@@ -157,6 +157,116 @@ aws cognito-idp admin-set-user-password --user-pool-id us-east-1_qLUhJF0h9 --use
 ![sign in worked](https://github.com/Dsar-gh/aws-bootcamp-cruddur-2023/blob/main/journal/assets/week3/prefered-name-added.PNG)
 
 
+#### Sign up Page [`SignupPage.js`](https://github.com/Dsar-gh/aws-bootcamp-cruddur-2023/blob/main/frontend-react-js/src/pages/SignupPage.js)
+
+We shouldn't be creating users by ourselves manually, therefore I  modified the `SignupPage.js` page so that users can sign up themselves.
+In the `SignupPage()` function, I modified the code related to the variable `onsubmit` to try signing up as follows: 
+
+```js
+import { Auth } from 'aws-amplify';
+
+const [errors, setErrors] = React.useState('');
+
+const onsubmit = async (event) => {
+    event.preventDefault();
+    setErrors('')
+    console.log('username',username)
+    console.log('email',email)
+    console.log('name',name)
+    try {
+        const { user } = await Auth.signUp({
+        username: email,
+        password: password,
+        attributes: {
+            name: name,
+            email: email,
+            preferred_username: username,
+        },
+        autoSignIn: { // optional - enables auto sign in after user is confirmed
+            enabled: true,
+        }
+        });
+        console.log(user);
+        window.location.href = `/confirm?email=${email}`
+    } catch (error) {
+        console.log(error);
+        setErrors(error.message)
+    }
+    return false
+}
+```
+
+#### Confirmation Page [`ConfirmationPage.js`](https://github.com/Dsar-gh/aws-bootcamp-cruddur-2023/blob/main/frontend-react-js/src/pages/ConfirmationPage.js)
+
+In the `ConfirmationPage()` function, I changed the code related to the variables `resend_code` and `onsubmit` to try signing up as follows: 
+
+```js
+import { Auth } from 'aws-amplify';
+
+const resend_code = async (event) => {
+    setErrors('')
+    try {
+      await Auth.resendSignUp(email);
+      console.log('code resent successfully');
+      setCodeSent(true)
+    } catch (err) {
+      // does not return a code
+      // does cognito always return english
+      // for this to be an okay match?
+      console.log(err)
+      if (err.message == 'Username cannot be empty'){
+        setErrors("You need to provide an email in order to send Resend Activiation Code")   
+      } else if (err.message == "Username/client id combination not found."){
+        setErrors("Email is invalid or cannot be found.")   
+      }
+    }
+}
+
+const onsubmit = async (event) => {
+    event.preventDefault();
+    setErrors('')
+    try {
+      await Auth.confirmSignUp(email, code);
+      window.location.href = "/"
+      console.log("hey, your account is confirmed now go to the signin page and log in to see your home feedback.")
+    } catch (error) {
+      setErrors(error.message)
+    }
+    return false
+  }
+```
+
+#### Recover Page [`RecoverPage.js`](https://github.com/Dsar-gh/aws-bootcamp-cruddur-2023/blob/main/frontend-react-js/src/pages/RecoverPage.js)
+
+`Recover Page` as well, is modified as follows. In the `RecoverPage()` function, I changed the code related to both variables `onsubmit_send_code` and `onsubmit_confirm_code` to be able to recover the password.
+
+```js
+import { Auth } from 'aws-amplify';
+
+const onsubmit_send_code = async (event) => {
+  event.preventDefault();
+  setErrors('')
+  Auth.forgotPassword(username)
+  .then((data) => setFormState('confirm_code') )
+  .catch((err) => setErrors(err.message) );
+  return false
+}
+
+const onsubmit_confirm_code = async (event) => {
+  event.preventDefault();
+  setErrors('')
+  if (password == passwordAgain){
+    Auth.forgotPasswordSubmit(username, code, password)
+    .then((data) => setFormState('success'))
+    .catch((err) => setErrors(err.message) );
+  } else {
+    setErrors('Passwords do not match')
+  }
+  return false
+}
+```
+
+
 
 
 

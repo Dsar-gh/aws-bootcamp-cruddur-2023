@@ -86,7 +86,7 @@ I didn't change anything. It was already done.
 
 #### [`ProfileInfo.js`](https://github.com/Dsar-gh/aws-bootcamp-cruddur-2023/blob/main/frontend-react-js/src/components/ProfileInfo.js)
 
-In the `ProfileInfo` function I modified the code related to the variable `signOut` as follows.
+In the `ProfileInfo()` function I modified the code related to the variable `signOut` as follows.
 
 ```js
 import { Auth } from 'aws-amplify';
@@ -117,8 +117,37 @@ I rearranged the `if` statements, to make the code clearer.
   }
 ```
 
+### Implement API Calls to Amazon Cognito for Custom Login, Signup, Recovery and Forgot Password Page
 
+#### Sign-in Page [`SigninPage.js`](https://github.com/Dsar-gh/aws-bootcamp-cruddur-2023/blob/main/frontend-react-js/src/pages/SigninPage.js)
 
+In the `SigninPage()` function I modified the code related to the variable `onsubmit` to try signing in and trigger an error if the user name or password incorrect are. Then confirmed if these changes are working.
+
+```js
+
+import { Auth } from 'aws-amplify';
+
+const [errors, setErrors] = React.useState('');
+  
+  const onsubmit = async (event) => {
+    setErrors('')
+    event.preventDefault();
+    Auth.signIn(email, password)
+    .then(user => {
+      console.log('user',user)
+      localStorage.setItem("access_token", user.signInUserSession.accessToken.jwtToken)
+      window.location.href = "/"
+    })
+    .catch(error => { 
+      if (error.code == 'UserNotConfirmedException') {
+        window.location.href = "/confirm"
+      }
+      setErrors(error.message)
+    });
+    return false
+  }
+  ```
+  ![sign-in](https://github.com/Dsar-gh/aws-bootcamp-cruddur-2023/blob/main/journal/assets/week3/sgin-in.PNG)
 
 
 

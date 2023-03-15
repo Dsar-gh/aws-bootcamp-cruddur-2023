@@ -418,7 +418,8 @@ class CognitoJwtToken:
         return claims
 
 ```
-- *********???????Used some code from this library `Flask-AWSCognito` 
+- Then I modified the [`app.py`](https://github.com/Dsar-gh/aws-bootcamp-cruddur-2023/blob/main/backend-flask/app.py) file using some code from this library `Flask-AWSCognito` to be able to verify a JWT Token at server (backend) side to serve authenticated API endpoints in my Flask Application.
+
 
 ```py
 from lib.cognito_jwt_token import CognitoJwtToken, extract_access_token, TokenVerifyError
@@ -488,6 +489,8 @@ def run(cognito_user_id=None):
         localStorage.removeItem("access_token")
     }
 ```
+
+![backend-cognito](https://github.com/Dsar-gh/aws-bootcamp-cruddur-2023/blob/main/journal/assets/week3/backend-cognito.PNG)
 
 
 

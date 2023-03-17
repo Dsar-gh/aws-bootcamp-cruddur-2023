@@ -219,32 +219,6 @@ To run the script.
 ```
 ![schema-script](https://github.com/Dsar-gh/aws-bootcamp-cruddur-2023/blob/main/journal/assets/week4/psql-schema.PNG)
 
-#### [`db-connect`](https://github.com/Dsar-gh/aws-bootcamp-cruddur-2023/blob/main/backend-flask/bin/db-connect)
-
-In the new `db-connect` file, the following lines are added.
-
-```sh
-#! /usr/bin/bash
-
-CYAN='\033[1;36m'
-NO_COLOR='\033[0m'
-LABEL="db-connect"
-printf "${CYAN}==== ${LABEL}${NO_COLOR}\n"
-
-if [ "$1" = "prod" ]; then
-  echo "Running in production mode"
-  URL=$PROD_CONNECTION_URL
-else
-  URL=$CONNECTION_URL
-fi
-
-psql $URL
-```
-
-To run the script.
-```sh
-./bin/db-connect
-```
 
 #### [`db-seed`](https://github.com/Dsar-gh/aws-bootcamp-cruddur-2023/blob/main/backend-flask/bin/db-seed)
 
@@ -280,6 +254,47 @@ To run the script.
 ```
 
 ![seed-script](https://github.com/Dsar-gh/aws-bootcamp-cruddur-2023/blob/main/journal/assets/week4/psql-seed.PNG)
+
+
+#### [`db-connect`](https://github.com/Dsar-gh/aws-bootcamp-cruddur-2023/blob/main/backend-flask/bin/db-connect)
+
+In the new `db-connect` file, the following lines are added.
+
+```sh
+#! /usr/bin/bash
+
+CYAN='\033[1;36m'
+NO_COLOR='\033[0m'
+LABEL="db-connect"
+printf "${CYAN}==== ${LABEL}${NO_COLOR}\n"
+
+if [ "$1" = "prod" ]; then
+  echo "Running in production mode"
+  URL=$PROD_CONNECTION_URL
+else
+  URL=$CONNECTION_URL
+fi
+
+psql $URL
+```
+
+To run the script.
+```sh
+./bin/db-connect
+```
+
+Now we can inquire information about our Cruddur DB as follows.
+
+```sql
+-- To list the tables in our Cruddur DB
+\dt
+```
+
+```sql
+-- To print out all records from the activities table in our Cruddur DB in an expanded display
+\x auto
+SELECT * FROM activities;
+```
 
 
 

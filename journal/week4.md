@@ -114,7 +114,7 @@ export CONNECTION_URL="postgresql://postgres:password@localhost:5432/cruddur"
 gp env CONNECTION_URL="postgresql://postgres:password@localhost:5432/cruddur"
 
 export PROD_CONNECTION_URL="postgresql://root:******@cruddur-db-instance.c26ykveazyqw.us-east-1.rds.amazonaws.com:5432/cruddur"
-gp env PROD_CONNECTION_URL="postgresql://postgres::******@cruddur-db-instance.c26ykveazyqw.us-east-1.rds.amazonaws.com:5432/cruddur"
+gp env PROD_CONNECTION_URL="postgresql://root:******@cruddur-db-instance.c26ykveazyqw.us-east-1.rds.amazonaws.com:5432/cruddur"
 
 ```
 
@@ -470,5 +470,8 @@ sql = """
 ```yml
       CONNECTION_URL: "postgresql://postgres:password@db:5432/cruddur"
 ```
+
+### Connecting our Cruddur to RDS DB via Gitpod
+
 
 

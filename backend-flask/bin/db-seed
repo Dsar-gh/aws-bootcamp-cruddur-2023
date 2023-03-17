@@ -5,7 +5,10 @@ NO_COLOR='\033[0m'
 LABEL="db-seed"
 printf "${CYAN}== ${LABEL}${NO_COLOR}\n"
 
-seed_path="$(realpath .)/db/seed.sql"
+#seed_path="$(realpath .)/db/seed.sql"
+SCRIPT_DIR="$(dirname "$(dirname "$(readlink -f "$0")")")"
+seed_path="$SCRIPT_DIR/db/seed.sql"
+
 echo $seed_path
 
 if [ "$1" = "prod" ]; then
@@ -16,6 +19,3 @@ else
 fi
 
 psql $URL cruddur < $seed_path
-
-#SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
-#seed_path="$SCRIPT_DIR/db/schema.sql"

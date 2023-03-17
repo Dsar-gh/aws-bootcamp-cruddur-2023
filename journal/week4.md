@@ -1,1 +1,284 @@
 # Week 4 — Postgres and RDS
+
+## Required Homework
+
+### Creating RDS DB Instance
+
+Using the following command, an RDS Instance is created.
+
+```shell
+aws rds create-db-instance \
+  --db-instance-identifier cruddur-db-instance \
+  --db-instance-class db.t3.micro \
+  --engine postgres \
+  --engine-version 14.6 \
+  --master-username root \
+  --master-user-password ****** \
+  --allocated-storage 20 \
+  --availability-zone us-east-1a\
+  --backup-retention-period 0 \
+  --port 5432 \
+  --no-multi-az \
+  --db-name cruddur \
+  --storage-type gp2 \
+  --publicly-accessible \
+  --storage-encrypted \
+  --enable-performance-insights \
+  --performance-insights-retention-period 7 \
+  --no-deletion-protection
+```
+![create rds](https://github.com/Dsar-gh/aws-bootcamp-cruddur-2023/blob/main/journal/assets/week4/create-rds.PNG)
+
+Once the RDS Instance is running, I changed its status to temporarily stop to avoid extra cost. This is valid only for 7 days, so it needs to be in check.
+
+![create rds](https://github.com/Dsar-gh/aws-bootcamp-cruddur-2023/blob/main/journal/assets/week4/2create-rds.PNG)
+
+### Configuring and using Postgres
+
+This command is used to connect to `psql` via the psql client cli tool.
+
+```
+psql -Upostgres --host localhost
+```
+
+These are some common PSQL commands will be needed in the following steps.
+
+```sql
+\x on -- expanded display when looking at data
+\q -- Quit PSQL
+\l -- List all databases
+\c database_name -- Connect to a specific database
+\dt -- List all tables in the current database
+\d table_name -- Describe a specific table
+\du -- List all users and their roles
+\dn -- List all schemas in the current database
+CREATE DATABASE database_name; -- Create a new database
+DROP DATABASE database_name; -- Delete a database
+CREATE TABLE table_name (column1 datatype1, column2 datatype2, ...); -- Create a new table
+DROP TABLE table_name; -- Delete a table
+SELECT column1, column2, ... FROM table_name WHERE condition; -- Select data from a table
+INSERT INTO table_name (column1, column2, ...) VALUES (value1, value2, ...); -- Insert data into a table
+UPDATE table_name SET column1 = value1, column2 = value2, ... WHERE condition; -- Update data in a table
+DELETE FROM table_name WHERE condition; -- Delete data from a table
+
+```
+
+### Creating a local database
+
+To create a local Database named cruddur inside postgres locally we can directly type the following command.
+```sh
+createdb cruddur -h localhost -U postgres
+```
+Or we can first connect to psql then using `sql` command create the DB as follows.
+
+```sh
+psql -U postgres -h localhost
+```
+![create db](https://github.com/Dsar-gh/aws-bootcamp-cruddur-2023/blob/main/journal/assets/week4/create-db-local.PNG)
+
+We can create the DB within the PSQL client.
+
+```sql
+CREATE database cruddur;
+```
+To list the DBs or to drop one we can use the following commands.
+
+```sql
+\l
+DROP database cruddur;
+```
+![list](https://github.com/Dsar-gh/aws-bootcamp-cruddur-2023/blob/main/journal/assets/week4/list-DBs.PNG)
+
+
+### Adding UUID Extension
+
+- A new SQL file called [`schema.sql`](https://github.com/Dsar-gh/aws-bootcamp-cruddur-2023/blob/main/backend-flask/db/schema.sql) is created under `backend-flask/db`
+- Postgres will generate out UUIDs. Therefore the extension called "uuid-ossp" is added inside the `schema.sql` file as follows.
+
+```sql
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+```
+
+- Running the following command will execute the `SQL` commands in the `db/schema.sql `file on the `cruddur` DB, using the `postgres` user and connecting to the PostgreSQL server running on `localhost`.
+
+```sh
+psql cruddur < db/schema.sql -h localhost -U postgres
+```
+
+### Setting up the `CONNECTION_URL` and `PROD_CONNECTION_URL` environment variables
+
+ These variables are needed to connect our Cruddur with the DB.
+ 
+```sh
+export CONNECTION_URL="postgresql://postgres:password@localhost:5432/cruddur"
+gp env CONNECTION_URL="postgresql://postgres:password@localhost:5432/cruddur"
+
+export PROD_CONNECTION_URL="postgresql://root:******@cruddur-db-instance.c26ykveazyqw.us-east-1.rds.amazonaws.com:5432/cruddur"
+gp env PROD_CONNECTION_URL="postgresql://postgres::******@cruddur-db-instance.c26ykveazyqw.us-east-1.rds.amazonaws.com:5432/cruddur"
+
+```
+
+To try connecting with the local DB 
+```sh
+psql $CONNECTION_URL
+# The output should be like this
+cruddur=#
+```
+
+### Writing Bash Scripts to connect to DB
+
+I created a new folder called [`bin`](https://github.com/Dsar-gh/aws-bootcamp-cruddur-2023/tree/main/backend-flask/bin) to hold all our bash scripts under `backend-flask/`. These Bash Scripts are used to create the cruddur DB, to drop it or to load the schema on the cruddur DB. To make the Scripts exeutable the permissions need to be changed to `rwxr--r--` as follows.
+
+```sh
+chmod u+x db-create 
+chmod u+x db-drop 
+chmod u+x db-schema-load 
+chmod u+x db-connect 
+chmod u+x db-seed 
+
+
+
+
+db-sessions db-setup
+```
+
+#### [`db-create`](https://github.com/Dsar-gh/aws-bootcamp-cruddur-2023/blob/main/backend-flask/bin/db-create)
+
+In the new `db-create` file, the following lines are added.
+
+```sh
+#! /usr/bin/bash
+
+CYAN='\033[1;36m'
+NO_COLOR='\033[0m'
+LABEL="db-create"
+printf "${CYAN}== ${LABEL}${NO_COLOR}\n"
+
+NO_DB_CONNECTION_URL=$(sed 's/\/cruddur//g' <<<"$CONNECTION_URL")
+psql $NO_DB_CONNECTION_URL -c "create database cruddur;"
+
+```
+To execute the script.
+
+```sh
+./bin/db-create
+```
+
+#### [`db-drop`](https://github.com/Dsar-gh/aws-bootcamp-cruddur-2023/blob/main/backend-flask/bin/db-drop)
+
+In the new `db-drop` file, the following lines are added.
+
+```sh
+#! /usr/bin/bash
+
+CYAN='\033[1;36m'
+NO_COLOR='\033[0m'
+LABEL="db-drop"
+printf "${CYAN}== ${LABEL}${NO_COLOR}\n"
+
+NO_DB_CONNECTION_URL=$(sed 's/\/cruddur//g' <<<"$CONNECTION_URL")
+psql $NO_DB_CONNECTION_URL -c "drop database cruddur;"
+```
+To execute the script.
+
+```sh
+./bin/db-drop
+```
+
+#### [`db-schema-load`](https://github.com/Dsar-gh/aws-bootcamp-cruddur-2023/blob/main/backend-flask/bin/db-schema-load)
+
+In the new `db-schema-load` file, the following lines are added.
+
+```sh
+#! /usr/bin/bash
+
+CYAN='\033[1;36m'
+NO_COLOR='\033[0m'
+LABEL="db-schema-load"
+printf "${CYAN}== ${LABEL}${NO_COLOR}\n"
+
+#schema_path="$(realpath .)/db/schema.sql"
+SCRIPT_DIR="$(dirname "$(dirname "$(readlink -f "$0")")")"
+schema_path="$SCRIPT_DIR/db/schema.sql"
+
+echo $schema_path
+
+if [ "$1" = "prod" ]; then
+  echo "Running in production mode"
+  URL=$PROD_CONNECTION_URL
+else
+  URL=$CONNECTION_URL
+fi
+
+psql $URL cruddur < $schema_path
+```
+
+To run the script.
+```sh
+./bin/db-schema-load
+```
+![schema-script](https://github.com/Dsar-gh/aws-bootcamp-cruddur-2023/blob/main/journal/assets/week4/psql-schema.PNG)
+
+#### [`db-connect`](https://github.com/Dsar-gh/aws-bootcamp-cruddur-2023/blob/main/backend-flask/bin/db-connect)
+
+In the new `db-connect` file, the following lines are added.
+
+```sh
+#! /usr/bin/bash
+
+CYAN='\033[1;36m'
+NO_COLOR='\033[0m'
+LABEL="db-connect"
+printf "${CYAN}==== ${LABEL}${NO_COLOR}\n"
+
+if [ "$1" = "prod" ]; then
+  echo "Running in production mode"
+  URL=$PROD_CONNECTION_URL
+else
+  URL=$CONNECTION_URL
+fi
+
+psql $URL
+```
+
+To run the script.
+```sh
+./bin/db-connect
+```
+
+#### [`db-seed`](https://github.com/Dsar-gh/aws-bootcamp-cruddur-2023/blob/main/backend-flask/bin/db-seed)
+
+In the new `db-seed` file, the following lines are added.
+
+```sh
+#! /usr/bin/bash
+
+CYAN='\033[1;36m'
+NO_COLOR='\033[0m'
+LABEL="db-seed"
+printf "${CYAN}== ${LABEL}${NO_COLOR}\n"
+
+#seed_path="$(realpath .)/db/seed.sql"
+SCRIPT_DIR="$(dirname "$(dirname "$(readlink -f "$0")")")"
+seed_path="$SCRIPT_DIR/db/seed.sql"
+
+echo $seed_path
+
+if [ "$1" = "prod" ]; then
+  echo "Running in production mode"
+  URL=$PROD_CONNECTION_URL
+else
+  URL=$CONNECTION_URL
+fi
+
+psql $URL cruddur < $seed_path
+```
+
+To run the script.
+```sh
+./bin/db-seed
+```
+
+![seed-script](https://github.com/Dsar-gh/aws-bootcamp-cruddur-2023/blob/main/journal/assets/week4/psql-seed.PNG)
+
+

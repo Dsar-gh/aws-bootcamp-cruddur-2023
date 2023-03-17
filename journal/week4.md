@@ -325,9 +325,9 @@ NO_COLOR='\033[0m'
 LABEL="db-setup"
 printf "${CYAN}==== ${LABEL}${NO_COLOR}\n"
 
-#bin_path="$(realpath .)/bin"
+bin_path="$(realpath .)/bin"
 
-bin_path="$"$(dirname "$(readlink -f "$0")")"
+
 source "$bin_path/db-drop"
 source "$bin_path/db-create"
 source "$bin_path/db-schema-load"

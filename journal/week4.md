@@ -127,20 +127,7 @@ cruddur=#
 
 ### Writing Bash Scripts to connect to DB
 
-I created a new folder called [`bin`](https://github.com/Dsar-gh/aws-bootcamp-cruddur-2023/tree/main/backend-flask/bin) to hold all our bash scripts under `backend-flask/`. These Bash Scripts are used to create the cruddur DB, to drop it or to load the schema on the cruddur DB. To make the Scripts exeutable the permissions need to be changed to `rwxr--r--` as follows.
-
-```sh
-chmod u+x db-create 
-chmod u+x db-drop 
-chmod u+x db-schema-load 
-chmod u+x db-connect 
-chmod u+x db-seed 
-
-
-
-
-db-sessions db-setup
-```
+I created a new folder called [`bin`](https://github.com/Dsar-gh/aws-bootcamp-cruddur-2023/tree/main/backend-flask/bin) to hold all our bash scripts under `backend-flask/`. These Bash Scripts are used to create the cruddur DB, to drop it or to load the schema on the cruddur DB. 
 
 #### [`db-create`](https://github.com/Dsar-gh/aws-bootcamp-cruddur-2023/blob/main/backend-flask/bin/db-create)
 
@@ -222,7 +209,7 @@ To run the script.
 
 #### [`db-seed`](https://github.com/Dsar-gh/aws-bootcamp-cruddur-2023/blob/main/backend-flask/bin/db-seed)
 
-In the new `db-seed` file, the following lines are added.
+In the new `db-seed` file, the following lines are added, to fill the tables in our Cruddur DB with some mock data.
 
 ```sh
 #! /usr/bin/bash
@@ -296,8 +283,68 @@ Now we can inquire information about our Cruddur DB as follows.
 SELECT * FROM activities;
 ```
 
+#### [`db-sessions`](https://github.com/Dsar-gh/aws-bootcamp-cruddur-2023/blob/main/backend-flask/bin/db-sessions)
+
+Executing this script will retrieve information about the active connections to the Cruddur DB, including the process ID, the username, the database name, the client IP address, the application name, and the connection state.
+
+```sh
+#! /usr/bin/bash
+CYAN='\033[1;36m'
+NO_COLOR='\033[0m'
+LABEL="db-sessions"
+printf "${CYAN}== ${LABEL}${NO_COLOR}\n"
+
+if [ "$1" = "prod" ]; then
+  echo "Running in production mode"
+  URL=$PROD_CONNECTION_URL
+else
+  URL=$CONNECTION_URL
+fi
+
+NO_DB_URL=$(sed 's/\/cruddur//g' <<<"$URL")
+psql $NO_DB_URL -c "select pid as process_id, \
+       usename as user,  \
+       datname as db, \
+       client_addr, \
+       application_name as app,\
+       state \
+from pg_stat_activity;"
+```
+
+#### [`db-setup`](https://github.com/Dsar-gh/aws-bootcamp-cruddur-2023/blob/main/backend-flask/bin/db-setup)
+
+Executing this script will setup (reset) everything for our Cruddur DB.
+
+```sh
+#! /usr/bin/bash
+-e # stop if it fails at any point
 
 
+CYAN='\033[1;36m'
+NO_COLOR='\033[0m'
+LABEL="db-setup"
+printf "${CYAN}==== ${LABEL}${NO_COLOR}\n"
+
+#bin_path="$(realpath .)/bin"
+
+bin_path="$"$(dirname "$(readlink -f "$0")")"
+source "$bin_path/db-drop"
+source "$bin_path/db-create"
+source "$bin_path/db-schema-load"
+source "$bin_path/db-seed"
+```
+
+To make all these Scripts exeutable the permissions need to be changed to `rwxr--r--` as follows.
+
+```sh
+chmod u+x db-create 
+chmod u+x db-drop 
+chmod u+x db-schema-load 
+chmod u+x db-connect 
+chmod u+x db-seed 
+chmod u+x db-sessions
+chmod u+x db-setup
+```
 ### Creating tables in Cruddur DB and adding Seed Data
 
 - The [`schema.sql`](https://github.com/Dsar-gh/aws-bootcamp-cruddur-2023/blob/main/backend-flask/db/schema.sql) is modified to create tables inside our Cruddur DB as follows.
@@ -340,3 +387,5 @@ VALUES
     current_timestamp + interval '10 day'
   )
 ```
+
+

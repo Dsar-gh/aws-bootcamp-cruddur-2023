@@ -388,4 +388,87 @@ VALUES
   )
 ```
 
+### Installing the PostgreSQL Adapter for Python (`Psycopg3`)
+
+- I added the following package in [`requirements.txt`](https://github.com/Dsar-gh/aws-bootcamp-cruddur-2023/blob/main/backend-flask/requirements.txt) and installed it using `pip install -r requirements.txt`. This way the `backend-flask` will be able to run SQL commands on the Cruddur DB.
+
+```txt
+psycopg[binary]
+psycopg[pool]
+```
+`psycopg[binary]` and `psycopg[pool]` are installation options for `Psycopg3` that provide additional functionality:
+
+`psycopg[binary]`: This installation option includes support for working with large binary objects (BLOBs) in PostgreSQL, such as images or audio files. If you need to store and retrieve large binary objects in a PostgreSQL database using `Psycopg3`, you should install `psycopg[binary]`.
+
+`psycopg[pool]`: This installation option includes support for connection pooling in PostgreSQL, which can help improve the performance and scalability of your Python application. Connection pooling allows you to reuse database connections across multiple requests, rather than creating a new connection for every request. If you are developing a web application or other high-traffic Python application that needs to interact with a PostgreSQL database, you should consider using `psycopg[pool]`.
+
+- I created a new file under `/backend-flask/lib` called [`db.py`](https://github.com/Dsar-gh/aws-bootcamp-cruddur-2023/blob/main/backend-flask/lib/db.py). this will be the connection for your backend
+
+```py
+from psycopg_pool import ConnectionPool
+import os
+
+def query_wrap_object(template):
+  sql = f"""
+  (SELECT COALESCE(row_to_json(object_row),'{{}}'::json) FROM (
+  {template}
+  ) object_row);
+  """
+  return sql
+
+def query_wrap_array(template):
+  sql = f"""
+  (SELECT COALESCE(array_to_json(array_agg(row_to_json(array_row))),'[]'::json) FROM (
+  {template}
+  ) array_row);
+  """
+  return sql
+
+connection_url = os.getenv("CONNECTION_URL")
+pool = ConnectionPool(connection_url)
+
+```
+
+- Then I imported the `psycopg_pool` through our library `db.py` in the [`home_activities.py`](https://github.com/Dsar-gh/aws-bootcamp-cruddur-2023/blob/main/backend-flask/services/home_activities.py) file as follows. 
+
+```py
+from lib.db import pool,query_wrap_array
+```
+
+And added the following code as well.
+
+```py
+sql = """
+      SELECT
+        activities.uuid,
+        users.display_name,
+        users.handle,
+        activities.message,
+        activities.replies_count,
+        activities.reposts_count,
+        activities.likes_count,
+        activities.reply_to_activity_uuid,
+        activities.expires_at,
+        activities.created_at
+      FROM public.activities
+      LEFT JOIN public.users ON users.uuid = activities.user_uuid
+      ORDER BY activities.created_at DESC
+      """
+      print(sql)
+      span.set_attribute("app.result_length", len(results))
+      with pool.connection() as conn:
+        with conn.cursor() as cur:
+          cur.execute(sql)
+          # this will return a tuple
+          # the first field being the data
+          json = cur.fetchall()
+      return json[0]
+```
+
+- In the [`docker-compose.yml`](https://github.com/Dsar-gh/aws-bootcamp-cruddur-2023/blob/main/docker-compose.yml) file I added the `CONNECTIONS_URL` environment variable for the `backend-flask` service as follows.
+
+```yml
+      CONNECTION_URL: "postgresql://postgres:password@db:5432/cruddur"
+```
+
 

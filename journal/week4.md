@@ -473,5 +473,28 @@ sql = """
 
 ### Connecting our Cruddur to RDS DB via Gitpod
 
+- Starting our RDS instance from AWS RDS console.
+- Editing security group for our RDS DB instance to accept traffic coming from Gitpod ID by adding `inbound rule`.
+- Now verify that the connection is working using `psql $PROD_CONNECTION_URL`
+
+![rds](https://github.com/Dsar-gh/aws-bootcamp-cruddur-2023/blob/main/journal/assets/week4/connected-rds.PNG)
+
+- Every time we lunch Gitpod, our IP address will change, therefore we need to modify our security group rule using AWS CLI as follows.
+   1. Exporting and saving our `DB_SG_ID` and `DB_SG_RULE_ID` Variables
+  ```sh
+  export DB_SG_ID="sg-090a88a9e495909ef"
+  gp env DB_SG_ID="sg-090a88a9e495909ef"
+  export DB_SG_RULE_ID="sgr-05daa92137ee73561"
+  gp env DB_SG_RULE_ID="sgr-05daa92137ee73561"
+  ```
+  2. Adding a new shell script [`rds-update-sg-rule`]() it will be executed once Gitpod is launced.
+  ```sh
+  aws ec2 modify-security-group-rules \
+      --group-id $DB_SG_ID \
+      --security-group-rules "SecurityGroupRuleId=$DB_SG_RULE_ID,SecurityGroupRule={Description=gitpod_from_command,IpProtocol=tcp,FromPort=5432,ToPort=5432,CidrIpv4=$GITPOD_IP/32}"
+  ```
+
+?????????????????????????????Edit db-connect script to accept prod RDS Connect URL.
+
 
 

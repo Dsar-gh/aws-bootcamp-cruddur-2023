@@ -487,12 +487,26 @@ sql = """
   export DB_SG_RULE_ID="sgr-05daa92137ee73561"
   gp env DB_SG_RULE_ID="sgr-05daa92137ee73561"
   ```
-  2. Adding a new shell script [`rds-update-sg-rule`]() it will be executed once Gitpod is launced.
+  2. Under `backend-flask/bin/` a new shell script [`rds-update-sg-rule`](https://github.com/Dsar-gh/aws-bootcamp-cruddur-2023/blob/main/backend-flask/bin/rds-update-sg-rule) is added and made sure that it's executable `chmod u+x ./bin/rds-update-sg-rule`. It will be executed every time Gitpod is launced.
+  
   ```sh
-  aws ec2 modify-security-group-rules \
-      --group-id $DB_SG_ID \
-      --security-group-rules "SecurityGroupRuleId=$DB_SG_RULE_ID,SecurityGroupRule={Description=gitpod_from_command,IpProtocol=tcp,FromPort=5432,ToPort=5432,CidrIpv4=$GITPOD_IP/32}"
+  aws ec2 modify-security-group-rules     --group-id $DB_SG_ID     --security-group-rules "SecurityGroupRuleId=$DB_SG_RULE_ID,SecurityGroupRule={Description=GITPOD,IpProtocol=tcp,FromPort=5432,ToPort=5432,CidrIpv4=$GITPOD_IP/32}"
   ```
+  3. The following lines are added  to the `.gitpod.yml`file under `postgres` task to send the new Gitpod IP address to AWS RDS when we launch our workspace in Gitpod.
+  
+  ```yml
+      command: |
+        export GITPOD_IP=$(curl ifconfig.me)
+        source  "$THEIA_WORKSPACE_ROOT/backend-flask/bin/rds-update-sg-rule"
+  ```
+  
+ - Now we need to change the `CONNECTIONS_URL` environment variable for the `backend-flask` service in the [`docker-compose.yml`](https://github.com/Dsar-gh/aws-bootcamp-cruddur-2023/blob/main/docker-compose.yml) file to our production RDS DB as follows.
+
+```yml
+      CONNECTION_URL: "$PROD_CONNECTION_URL"
+```
+
+
 
 ?????????????????????????????Edit db-connect script to accept prod RDS Connect URL.
 

@@ -508,14 +508,51 @@ sql = """
 
 ### Setup Cognito post confirmation lambda
 
-??????To create Lambda-Congito Trigger when an user is inserted into our Cruddur DB
-???????to insert registered users post registration confirmation into the users table within cruddur database.
+To create Lambda-Congito Trigger when an user signed-up and is inserted into our Cruddur RDS DB.
 
 1. At first I created a new lambda function using AWS console. The setup was done as follows:
-    - Author from scratch
-    - Provide the function name
-    - Runtime: Python3.8
-    - Architecture: x86_64
+  - Author from scratch
+  - Provide the function name: `cruddur-post-confirmation`
+  - Runtime: `Python3.8`
+  - Architecture: `x86_64`
+
+2. After creating our `cruddur-post-confirmation` lambda function I changed its code source in AWS Console then deployed it to be saved. The new code source for lambda function [`cruddur-post-confirmation.py`](https://github.com/Dsar-gh/aws-bootcamp-cruddur-2023/blob/main/aws/lambdas/cruddur-post-confirmation.py) is saved as well under `aws/lambdas/` in our Repo.
+
+3. In our `cruddur-post-confirmation` lambda function by clicking on Configuration tab I added the environment variable `CONNECTION_URL` and its value is our RDS DB instance (`PROD_CONNECTION_URL`) as follows:
+
+![env-lambda](https://github.com/Dsar-gh/aws-bootcamp-cruddur-2023/blob/main/journal/assets/week4/add-env-lambda.PNG)
+   
+
+4. In our `cruddur-post-confirmation` lambda function by clicking on Code  tab I added a lambda Layer by specifying an ARN (`arn:aws:lambda:us-east-1:898466741470:layer:psycopg2-py38:2`) from this [repo](https://github.com/jetbridge/psycopg2-lambda-layer).
+
+![lambda-layer](https://github.com/Dsar-gh/aws-bootcamp-cruddur-2023/blob/main/journal/assets/week4/lambda-layer.PNG)
+
+
+5. I added a lambda trigger using AWS Console, therefore I needed to go to  Amazon Cognito-> user pools -> then to  my `cruddur-user-pool` by clicking on `User pool properties` tab. The lambda trigger is  configured as follows:
+  - Tigger Type: `Sign-up`
+  - Sign-Up: `Post confirmation Trigger`
+  - Assign Lambda function: `cruddur-post-confirmation`
+
+  ![lambda-trigger](https://github.com/Dsar-gh/aws-bootcamp-cruddur-2023/blob/main/journal/assets/week4/lambda-trigger.PNG)
+
+
+6. The [`schema.sql`](https://github.com/Dsar-gh/aws-bootcamp-cruddur-2023/blob/main/backend-flask/db/schema.sql) file is modified that each user have an `email` and changed `handle` to `preferred_username` as follows:
+
+    ```sql
+    CREATE TABLE public.users (
+      uuid UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+      display_name text NOT NULL,
+      --handle text NOT NULL, handle is same as preferred_username
+      preferred_username text NOT NULL, -- same as handle, make sure to check lambda function
+      email text NOT NULL,
+      cognito_user_id text NOT NULL,
+      created_at TIMESTAMP default current_timestamp NOT NULL
+    );
+    ```
+
+
+
+
 
 
 

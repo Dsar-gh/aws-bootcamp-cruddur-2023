@@ -480,19 +480,19 @@ sql = """
 ![rds](https://github.com/Dsar-gh/aws-bootcamp-cruddur-2023/blob/main/journal/assets/week4/connected-rds.PNG)
 
 - Every time we lunch Gitpod, our IP address will change, therefore we need to modify our security group rule using AWS CLI as follows.
-   1. Exporting and saving our `DB_SG_ID` and `DB_SG_RULE_ID` Variables
+1.  Exporting and saving our `DB_SG_ID` and `DB_SG_RULE_ID` Variables
   ```sh
   export DB_SG_ID="sg-090a88a9e495909ef"
   gp env DB_SG_ID="sg-090a88a9e495909ef"
   export DB_SG_RULE_ID="sgr-05daa92137ee73561"
   gp env DB_SG_RULE_ID="sgr-05daa92137ee73561"
   ```
-  2. Under `backend-flask/bin/` a new shell script [`rds-update-sg-rule`](https://github.com/Dsar-gh/aws-bootcamp-cruddur-2023/blob/main/backend-flask/bin/rds-update-sg-rule) is added and made sure that it's executable `chmod u+x ./bin/rds-update-sg-rule`. It will be executed every time Gitpod is launced.
+2.  Under `backend-flask/bin/` a new shell script [`rds-update-sg-rule`](https://github.com/Dsar-gh/aws-bootcamp-cruddur-2023/blob/main/backend-flask/bin/rds-update-sg-rule) is added and made sure that it's executable `chmod u+x ./bin/rds-update-sg-rule`. It will be executed every time Gitpod is launced.
   
   ```sh
   aws ec2 modify-security-group-rules     --group-id $DB_SG_ID     --security-group-rules "SecurityGroupRuleId=$DB_SG_RULE_ID,SecurityGroupRule={Description=GITPOD,IpProtocol=tcp,FromPort=5432,ToPort=5432,CidrIpv4=$GITPOD_IP/32}"
   ```
-  3. The following lines are added  to the `.gitpod.yml`file under `postgres` task to send the new Gitpod IP address to AWS RDS when we launch our workspace in Gitpod.
+3.  The following lines are added  to the `.gitpod.yml`file under `postgres` task to send the new Gitpod IP address to AWS RDS when we launch our workspace in Gitpod.
   
   ```yml
       command: |
@@ -506,7 +506,16 @@ sql = """
       CONNECTION_URL: "$PROD_CONNECTION_URL"
 ```
 
-c
+### Setup Cognito post confirmation lambda
+
+??????To create Lambda-Congito Trigger when an user is inserted into our Cruddur DB
+???????to insert registered users post registration confirmation into the users table within cruddur database.
+
+1. At first I created a new lambda function using AWS console. The setup was done as follows:
+    - Author from scratch
+    - Provide the function name
+    - Runtime: Python3.8
+    - Architecture: x86_64
 
 
 

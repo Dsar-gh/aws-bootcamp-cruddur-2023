@@ -584,6 +584,12 @@ To create Lambda-Congito Trigger when an user signed-up and is inserted into our
       
       ![lambda-vpc2](https://github.com/Dsar-gh/aws-bootcamp-cruddur-2023/blob/main/journal/assets/week4/lambda-vpc2.PNG)
       
+   
+   Now confirming our setup of Cognito post confirmation lambda
+   
+   ![lambda-worked](https://github.com/Dsar-gh/aws-bootcamp-cruddur-2023/blob/main/journal/assets/week4/lambda-worked.PNG)
+   
+      
       
       
  

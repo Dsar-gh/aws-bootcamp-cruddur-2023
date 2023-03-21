@@ -523,12 +523,12 @@ To create Lambda-Congito Trigger when an user signed-up and is inserted into our
 ![env-lambda](https://github.com/Dsar-gh/aws-bootcamp-cruddur-2023/blob/main/journal/assets/week4/add-env-lambda.PNG)
    
 
-4. In our `cruddur-post-confirmation` lambda function by clicking on Code  tab I added a lambda Layer by specifying an ARN (`arn:aws:lambda:us-east-1:898466741470:layer:psycopg2-py38:2`) from this [repo](https://github.com/jetbridge/psycopg2-lambda-layer).
+4. In our `cruddur-post-confirmation` lambda function by clicking on Code tab I added a lambda Layer by specifying an ARN (`arn:aws:lambda:us-east-1:898466741470:layer:psycopg2-py38:2`) from this [repo](https://github.com/jetbridge/psycopg2-lambda-layer).
 
 ![lambda-layer](https://github.com/Dsar-gh/aws-bootcamp-cruddur-2023/blob/main/journal/assets/week4/lambda-layer.PNG)
 
 
-5. I added a lambda trigger using AWS Console, therefore I needed to go to  Amazon Cognito-> user pools -> then to  my `cruddur-user-pool` by clicking on `User pool properties` tab. The lambda trigger is  configured as follows:
+5. I added a lambda trigger using AWS Console, therefore I needed to go to  Amazon Cognito > user pools  > then to  my `cruddur-user-pool` by clicking on `User pool properties` tab. The lambda trigger is  configured as follows:
   - Tigger Type: `Sign-up`
   - Sign-Up: `Post confirmation Trigger`
   - Assign Lambda function: `cruddur-post-confirmation`
@@ -549,6 +549,46 @@ To create Lambda-Congito Trigger when an user signed-up and is inserted into our
       created_at TIMESTAMP default current_timestamp NOT NULL
     );
     ```
+
+7.  To grant my Lambda function the necessary permissions to create a network interface and to access my VPC resources (Cruddur RDS DB) I assigned a customed IAM role to it. I needed to update the IAM policy attached to this role and granted it the required permissions. I did this by following these steps:
+  
+    - In our `cruddur-post-confirmation` lambda function by clicking on: Configuration tab > Permissions, I added an addition policy to the execution role. This was done by clicking on the existed Role name , which redirects us on to the IAM Management Console for this lambda Role. There I did the following: Attach policies > Create Police > Choose a Service:`EC2` > Open JSON editor instead of visual editor then I added the following lines to this policy:
+      
+      ```json
+      {
+          "Version": "2012-10-17",
+          "Statement": [
+              {
+                  "Effect": "Allow",
+                  "Action": [
+                      "ec2:CreateNetworkInterface",
+                      "ec2:DeleteNetworkInterface",
+                      "ec2:DescribeNetworkInterfaces",
+                      "ec2:AttachNetworkInterface",
+                      "ec2:DescribeInstances"
+                  ],
+                  "Resource": "*"
+              }
+          ]
+      }
+      ````
+      
+    - I created the `AWSLambdaVPCAccessExecutionRole` Policy. After that I attached the created policy to the Lambda role.
+    
+    ![lambda-policy](https://github.com/Dsar-gh/aws-bootcamp-cruddur-2023/blob/main/journal/assets/week4/lambda-role.PNG)
+    
+       
+    - In our `cruddur-post-confirmation` lambda function by clicking on: Configuration tab > VPC > edit VPC as follows:
+      
+      ![lambda-vpc](https://github.com/Dsar-gh/aws-bootcamp-cruddur-2023/blob/main/journal/assets/week4/lambda-vpc.PNG)
+      
+      ![lambda-vpc2](https://github.com/Dsar-gh/aws-bootcamp-cruddur-2023/blob/main/journal/assets/week4/lambda-vpc2.PNG)
+      
+      
+      
+ 
+  
+
 
 
 

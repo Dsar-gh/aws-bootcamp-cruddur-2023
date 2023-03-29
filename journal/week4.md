@@ -653,7 +653,7 @@ To create Lambda-Congito Trigger when an user signed-up and is inserted into our
     
     ```
     
- 2. The [`db.py`](https://github.com/Dsar-gh/aws-bootcamp-cruddur-2023/blob/main/backend-flask/lib/db.py) file is modified to be able to create an activity. Five functions are added as follows:
+ 2. The [`db.py`](https://github.com/Dsar-gh/aws-bootcamp-cruddur-2023/blob/main/backend-flask/lib/db.py) file is modified to be able to create an activity. Eight functions are added as follows:
 
     2.1.  A function that reads SQL template
       
@@ -790,7 +790,7 @@ To create Lambda-Congito Trigger when an user signed-up and is inserted into our
       
       ```
       
- 3. The [`create_activity.py`](https://github.com/Dsar-gh/aws-bootcamp-cruddur-2023/blob/main/backend-flask/services/create_activity.py) file is modified as follows to make use of the `db` object from step 2.
+3. The [`create_activity.py`](https://github.com/Dsar-gh/aws-bootcamp-cruddur-2023/blob/main/backend-flask/services/create_activity.py) file is modified as follows to make use of the `db` object from step 2.
     
      ```py
       
@@ -867,7 +867,7 @@ To create Lambda-Congito Trigger when an user signed-up and is inserted into our
       
       ```
  
- 4. The [`home_activities.py `](https://github.com/Dsar-gh/aws-bootcamp-cruddur-2023/blob/main/backend-flask/services/home_activities.py) file is modified as well to make use of the `db` object from step 2.
+4. The [`home_activities.py `](https://github.com/Dsar-gh/aws-bootcamp-cruddur-2023/blob/main/backend-flask/services/home_activities.py) file is modified as well to make use of the `db` object from step 2.
 
      ```py
       from datetime import datetime, timedelta, timezone
@@ -894,7 +894,7 @@ To create Lambda-Congito Trigger when an user signed-up and is inserted into our
      
      ```
      
-   5. To create an activity for my user, I changed the hard coded `user_handle = 'andrewbrown'` to my user in the [`app.py`](https://github.com/Dsar-gh/aws-bootcamp-cruddur-2023/blob/main/backend-flask/app.py) file.
+ 5. To create an activity for my user, I changed the hard coded `user_handle = 'andrewbrown'` to my user in the [`app.py`](https://github.com/Dsar-gh/aws-bootcamp-cruddur-2023/blob/main/backend-flask/app.py) file.
    
    
  Successfully added cruds to my Home.

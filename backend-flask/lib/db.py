@@ -44,10 +44,16 @@ class Db:
   # commit data such as an insert
   # RETURNING in all uppercases
   def query_commit(self,sql,**kwargs):
+    cyan = '\033[96m'
+    no_color = '\033[0m'
+    print("\n")
+    print(f'{cyan}SQL STATEMENT-[{sql}]-----------------{no_color}')
+    print("\n")
     self.print_sql('commit with returning', sql)
   
     pattern = r"\bRETURNING\b"
     is_returning_id = re.search(pattern, sql)
+    print(is_returning_id)
 
     try:
       with self.pool.connection() as conn:
